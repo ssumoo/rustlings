@@ -14,7 +14,6 @@
 
 // Execute `rustlings hint hashmaps3` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
 use std::collections::HashMap;
 
@@ -23,6 +22,25 @@ struct Team {
     name: String,
     goals_scored: u8,
     goals_conceded: u8,
+}
+
+fn insert_or_add(mut map: &mut HashMap<String, Team>, team_name: &String, goals_scored: &u8, goals_conceded: &u8) {
+    match map.get_mut(team_name) {
+        Some(team) => {
+            team.goals_scored += *goals_scored;
+            team.goals_conceded += *goals_conceded;
+        },
+        None => {
+            match map.insert((*team_name.clone()).to_string(), Team{
+                name: (*team_name.clone()).to_string(), 
+                goals_scored: *goals_scored, 
+                goals_conceded: *goals_conceded,
+            }) {
+                Some(_) => {panic!("this should not happen");},
+                None => ()
+            };    
+        }
+    };
 }
 
 fn build_scores_table(results: String) -> HashMap<String, Team> {
@@ -36,6 +54,9 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         let team_2_name = v[1].to_string();
         let team_2_score: u8 = v[3].parse().unwrap();
         // TODO: Populate the scores table with details extracted from the
+
+        insert_or_add(&mut scores, &team_1_name, &team_1_score, &team_2_score);
+        insert_or_add(&mut scores, &team_2_name, &team_2_score, &team_1_score);
         // current line. Keep in mind that goals scored by team_1
         // will be the number of goals conceded from team_2, and similarly
         // goals scored by team_2 will be the number of goals conceded by
@@ -65,7 +86,8 @@ mod tests {
         keys.sort();
         assert_eq!(
             keys,
-            vec!["England", "France", "Germany", "Italy", "Poland", "Spain"]
+            vec!["England", "France", "Germany", "Italy", "Poland", "Spain"],
+            "{}", format!("{:?}", keys),
         );
     }
 
